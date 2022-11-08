@@ -1,0 +1,20 @@
+{
+	"name": "Cryptocurrency Highlighter",
+	"description": "Highlights cryptocurrency.",
+	"version": "1.0.0",
+	"manifest_version": 3,
+	"permissions": ["tabs"],
+	"background": {
+    	"service_worker": "background.js"
+  	},
+  	"content_scripts": [
+  		{
+  			"matches": ["https://*/*", "http://*/*"],
+  			"js": ["highlighter.js"]
+  		}
+  	],
+  	"action": {
+    	"default_popup": "popup.html",
+    	"default_title": "Click to see captured crypto addrs"
+  	}
+}

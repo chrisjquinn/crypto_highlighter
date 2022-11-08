@@ -1,0 +1,36 @@
+table {
+  margin:  0;
+  padding: 0;
+}
+
+td {
+  text-align: left;
+  vertical-align: middle;
+}
+
+p {
+  font-size: 10px;
+}
+
+/*.ticker-image {
+  vertical-align: middle;
+}*/
+
+
+img {
+  height: 15px;
+  width: 15px;
+}
+
+input:active {
+  box-shadow: 5px 5px 20px 2px #999999;
+}
+
+input {
+  height: 15px;
+  width: 15px;
+}
+
+button {
+  float: right;
+}
