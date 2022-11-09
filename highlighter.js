@@ -106,7 +106,15 @@ function wrapTextNode(textNode, ticker) {
     spanNode.setAttribute('class', 'crypto-highlighter-mark-'+ticker.toLowerCase());
     var newTextNode = document.createTextNode(textNode.textContent);
     spanNode.appendChild(newTextNode);
+    spanNode.addEventListener("click", copyAddressToClipboard);
     textNode.parentNode.replaceChild(spanNode, textNode);
+};
+
+const copyAddressToClipboard = e => {
+	// works for span, needs some sort of visual confirmation
+	const addressText = e.target.innerText;
+	navigator.clipboard.writeText(addressText);
+	// console.log(`Copied the text: ${addressText}`);
 };
 
 

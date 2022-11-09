@@ -6,3 +6,6 @@
   background-color: blue;
 }
 
+span:hover {
+  cursor: pointer;
+}
