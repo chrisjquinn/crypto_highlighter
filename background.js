@@ -1,10 +1,7 @@
-// background.js
-// taken from the chrome ext v3 injecting a content script on click
-
 const setBadgeIcon = items =>  {
   // items will be an object of {TICKER: [Addresses]}
-  console.log(`Object.keys(items): ${Object.keys(items)}`);
-  console.log(`Object.keys(items).length: ${Object.keys(items).length}`);
+  // console.log(`Object.keys(items): ${Object.keys(items)}`);
+  // console.log(`Object.keys(items).length: ${Object.keys(items).length}`);
 
   let total_length = 0;
 
@@ -28,7 +25,7 @@ const setBadgeIcon = items =>  {
 };
 
 
-
+// Below are the listeners for when the tab is updated or activated
 chrome.tabs.onUpdated.addListener((tabId, tab) => {
   if (tab.url) {
     chrome.tabs.sendMessage(tabId, {
@@ -39,7 +36,7 @@ chrome.tabs.onUpdated.addListener((tabId, tab) => {
 
 
 chrome.tabs.onActivated.addListener(activeInfo => {
-  console.log(`activeInfo: ${JSON.stringify(activeInfo)}`);
+  // console.log(`activeInfo: ${JSON.stringify(activeInfo)}`);
   chrome.tabs.sendMessage(activeInfo.tabId, {
     type: "NEW",
   }, setBadgeIcon);

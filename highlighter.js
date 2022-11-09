@@ -19,25 +19,33 @@ const performRegex = () => {
 	  };
 
 	  let texts = getTextNodes(document.documentElement);
+	  console.log(`texts.length: ${texts.length}`);
+	  console.log(`texts.filter(onlyUnique).length: ${texts.filter(onlyUnique).length}`);
 	  // texts = [].concat.apply([],texts);
 	  for (let i = 0; i < texts.length; i++){
 	  	for (let j = 0; j < Object.keys(regexs).length; j++) {
 	  		ticker = Object.keys(regexs)[j];
 	  		re = new RegExp(regexs[ticker], 'gm');
-	  		match = texts[i].match(re);
+	  		match = texts[i].nodeValue.match(re);
 		  	if ((match) && (match.indexOf(",") == -1)) {
 		  		matches[ticker].push(... match);
+		  		// make mark on texts[i]
+		  		wrapTextNode(texts[i], ticker);
 		  	} else if ((match) && (match.indexOf(",") > -1)) {
 		  		matches[ticker].push(... match.split(","));
+		  		// make mark on texts[i]
+		  		wrapTextNode(texts[i], ticker);
 		  	} else {}
 
 	  	}
 
 	  }
 
+	  // Below is a to:do, figure out how to represent addresses found in commented HTML
+
 	  // let comments = getAllComments(document.documentElement);
 	  // for (let i = 0; i < comments.length; i++) {
-	  // 	match = comments[i].match(re);
+	  // 	match = comments[i].nodeValue.match(re);
 	  // 	if ((match) && (match.indexOf(",") == -1)) {
 	  // 		matches.push(...match.map(x => "<!-- " +x)); 
 	  // 	} else if ((match) && (match.indexOf(",") > -1)) {
@@ -46,12 +54,13 @@ const performRegex = () => {
 	  // }
 
 
-	//   const whole_html_string_1 = document.documentElement.innerHTML;
+	  // const whole_html_string_1 = document.documentElement.innerHTML;
 	  // const matching_btc_1 = whole_html_string_1.match(re);
 	  // if (matching_btc_1) {
 	  // 	const uniques_2 = matching_btc_1.filter(onlyUnique);
 	  // 	console.log(`${uniques_2.length}  uniques from innerHTML: ${uniques_2}`);
 	  // }
+
 
 	  if (matches) {
 	  	let tickers_to_delete = [];
@@ -67,14 +76,9 @@ const performRegex = () => {
 	  	for (let i = 0; i < tickers_to_delete.length; i ++){
 	  		delete matches[tickers_to_delete[i]];
 	  	}
-	  	// uniques = matches.filter(onlyUnique);
-	  	console.log(`${Object.values(matches)} matches: ${JSON.stringify(matches)}`);
+	  	// console.log(`${Object.values(matches)} matches: ${JSON.stringify(matches)}`);
 	  	return matches;
 	  }
-
-	  // else {
-	  // 	return matches;
-	  // }
 };
 
 function getAllComments(rootElem) {
@@ -82,7 +86,7 @@ function getAllComments(rootElem) {
     var iterator = document.createNodeIterator(rootElem, NodeFilter.SHOW_COMMENT);
     var curNode;
     while (curNode = iterator.nextNode()) {
-        comments.push(curNode.nodeValue);
+        comments.push(curNode);
     }
     return comments;
 };
@@ -92,10 +96,21 @@ function getTextNodes(rootElem){
     var iterator = document.createNodeIterator(rootElem, NodeFilter.SHOW_TEXT);
     var curNode;
     while (curNode = iterator.nextNode()) {
-        texts.push(curNode.nodeValue);
+        texts.push(curNode);
     }
     return texts;
 };
+
+function wrapTextNode(textNode, ticker) {
+    var spanNode = document.createElement('span');
+    spanNode.setAttribute('class', 'crypto-highlighter-mark-'+ticker.toLowerCase());
+    var newTextNode = document.createTextNode(textNode.textContent);
+    spanNode.appendChild(newTextNode);
+    textNode.parentNode.replaceChild(spanNode, textNode);
+};
+
+
+// below are the chrome listeners for messages from background.js
 
 
 chrome.runtime.onMessage.addListener((obj, sender, response) => {

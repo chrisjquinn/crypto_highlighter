@@ -9,8 +9,9 @@
   	},
   	"content_scripts": [
   		{
-  			"matches": ["https://*/*", "http://*/*"],
-  			"js": ["highlighter.js"]
+  			"matches": ["https://*/*", "http://*/*", "file://*/*"],
+  			"js": ["highlighter.js"],
+  			"css": ["highlighter.css"]
   		}
   	],
   	"action": {
