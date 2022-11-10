@@ -27,18 +27,15 @@ const setBadgeIcon = items =>  {
 
 // Below are the listeners for when the tab is updated or activated
 chrome.tabs.onUpdated.addListener((tabId, tab) => {
-  if (tab.url) {
-    chrome.tabs.sendMessage(tabId, {
+  chrome.tabs.sendMessage(tabId, {
       type: "NEW",
     }, setBadgeIcon);
-  }
 });
 
 
 chrome.tabs.onActivated.addListener(activeInfo => {
-  // console.log(`activeInfo: ${JSON.stringify(activeInfo)}`);
   chrome.tabs.sendMessage(activeInfo.tabId, {
-    type: "NEW",
+    type: "SWITCHED",
   }, setBadgeIcon);
 });
 

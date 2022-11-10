@@ -7,7 +7,8 @@ function onlyUnique(value, index, self) {
   return self.indexOf(value) === index;
 };
 
-const performRegex = () => {
+const performRegex = (highlight) => {
+	  // param highlight will wrap the match in a span if wanted
 	  // Construct global and multiline
 	  // const btc_re = new RegExp(regexs.BTC, 'gm');
 	  // const eth_re = new RegExp(regexs.ETH, 'gm');
@@ -19,8 +20,6 @@ const performRegex = () => {
 	  };
 
 	  let texts = getTextNodes(document.documentElement);
-	  console.log(`texts.length: ${texts.length}`);
-	  console.log(`texts.filter(onlyUnique).length: ${texts.filter(onlyUnique).length}`);
 	  // texts = [].concat.apply([],texts);
 	  for (let i = 0; i < texts.length; i++){
 	  	for (let j = 0; j < Object.keys(regexs).length; j++) {
@@ -30,11 +29,11 @@ const performRegex = () => {
 		  	if ((match) && (match.indexOf(",") == -1)) {
 		  		matches[ticker].push(... match);
 		  		// make mark on texts[i]
-		  		wrapTextNode(texts[i], ticker);
+		  		if (highlight) {wrapTextNode(texts[i], ticker);}
 		  	} else if ((match) && (match.indexOf(",") > -1)) {
 		  		matches[ticker].push(... match.split(","));
 		  		// make mark on texts[i]
-		  		wrapTextNode(texts[i], ticker);
+		  		if (highlight) {wrapTextNode(texts[i], ticker);}
 		  	} else {}
 
 	  	}
@@ -119,12 +118,21 @@ const copyAddressToClipboard = e => {
 
 
 // below are the chrome listeners for messages from background.js
-
+// Think these can be collapsed into one
 
 chrome.runtime.onMessage.addListener((obj, sender, response) => {
 	const {type, value} = obj;
 	if (type === 'NEW'){
-		matches = performRegex();
+		matches = performRegex(true);
+		response(matches);
+	}
+});
+
+
+chrome.runtime.onMessage.addListener((obj, sender, response) => {
+	const {type, value} = obj;
+	if (type === 'SWITCHED'){
+		matches = performRegex(false);
 		response(matches);
 	}
 });
@@ -133,7 +141,7 @@ chrome.runtime.onMessage.addListener((obj, sender, response) => {
 chrome.runtime.onMessage.addListener((obj, sender, response) => {
 	const {type, value} = obj;
 	if (type === 'Addresses'){
-		matches = performRegex();
+		matches = performRegex(false);
 		response(matches);
 	}
 });
