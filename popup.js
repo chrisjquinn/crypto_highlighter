@@ -47,7 +47,7 @@ const copyAllAddressesToClipboard = e => {
 	for (let i = 0, row; row = table.rows[i]; i++) {
 		allAddressesForClipboard.push(row.getAttribute("address"));
 	}
-	console.log(`All addresses for clipboard: ${allAddressesForClipboard}`);
+	// console.log(`All addresses for clipboard: ${allAddressesForClipboard}`);
 	navigator.clipboard.writeText(allAddressesForClipboard.join("\n"));
 };
 
@@ -56,7 +56,7 @@ const copyAddressToClipboard = e => {
 	const addressText = e.target.getAttribute('address');
 	e.target.select();
 	navigator.clipboard.writeText(addressText);
-	console.log(`Copied the text: ${addressText}`);
+	// console.log(`Copied the text: ${addressText}`);
 };
 
 
