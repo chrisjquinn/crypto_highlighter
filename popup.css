@@ -29,3 +29,8 @@ input {
 button {
   float: right;
 }
+
+.dark-mode {
+  background-color: black;
+  color: white;
+}

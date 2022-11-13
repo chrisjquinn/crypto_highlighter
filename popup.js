@@ -1,5 +1,7 @@
 import {getActiveTabURL} from "./utils.js"
 
+let color_theme;
+
 const addNewAddress = (addressesElement, ticker, address) => {
 	// console.log(`Address: ${address}`);
 
@@ -12,14 +14,12 @@ const addNewAddress = (addressesElement, ticker, address) => {
 	addressPictureElement.title = ticker + ' logo';
 	addressPictureElement.className = '.ticker-image';
 
-	addressCopyElement.src = 'assets/copy.svg';
+	addressCopyElement.src = 'assets/copy-'+color_theme+'.png';
 	addressCopyElement.title = 'Copy address to clipboard';
 	addressCopyElement.type = 'image';
 	addressCopyElement.setAttribute("address", address);
 	addressCopyElement.addEventListener("click", copyAddressToClipboard);
 
-
-	// could do with an improvement
 	let addressRowElement = addressesElement.insertRow();
 	addressRowElement.setAttribute("address", address);
 	let td = addressRowElement.insertCell();
@@ -36,7 +36,7 @@ const addCopyAllElement = () => {
 	let copyAllElement = document.createElement("button");
 	copyAllElement.textContent = "Copy All";
 	copyAllElement.addEventListener("click", copyAllAddressesToClipboard);
-	titleElement.appendChild(copyAllElement);
+	titleElement.append(copyAllElement);
 };
 
 
@@ -47,7 +47,6 @@ const copyAllAddressesToClipboard = e => {
 	for (let i = 0, row; row = table.rows[i]; i++) {
 		allAddressesForClipboard.push(row.getAttribute("address"));
 	}
-	// console.log(`All addresses for clipboard: ${allAddressesForClipboard}`);
 	navigator.clipboard.writeText(allAddressesForClipboard.join("\n"));
 };
 
@@ -56,7 +55,6 @@ const copyAddressToClipboard = e => {
 	const addressText = e.target.getAttribute('address');
 	e.target.select();
 	navigator.clipboard.writeText(addressText);
-	// console.log(`Copied the text: ${addressText}`);
 };
 
 
@@ -78,16 +76,56 @@ const viewAddresses = (addresses) => {
 	}
 };
 
+const setThemeMode = async () => {
+	// retrieve current theme
+	color_theme = await chrome.storage.sync.get(['theme']);
+	color_theme = color_theme.theme;
+
+	// change html root class
+	const html_root = document.getElementsByTagName('html')[0];
+	html_root.classList = color_theme + '-mode';
+
+	// change the sun / moon image
+	const toggle_image = document.getElementById('theme');
+	toggle_image.addEventListener("click", toggleThemeMode);
+	if (color_theme === "dark"){
+		toggle_image.src = 'assets/moon.svg';
+	} else {
+		toggle_image.src = 'assets/sun.svg';
+	}
+
+	// loop through and replace all the copy elements
+	let all_inputs = document.getElementsByTagName('input');
+	for (let i = 0; i < all_inputs.length; i++) {
+		let current = all_inputs[i];
+		if (current.src.includes('copy')){
+			current.src = 'assets/copy-'+color_theme+'.png';
+		}
+	}
+};
+
+const toggleThemeMode = async () => {
+	// change then reload the theme
+	color_theme = await chrome.storage.sync.get(['theme']);
+	color_theme = color_theme.theme;
+	if (color_theme === "dark") {
+		await chrome.storage.sync.set({["theme"]: "light"});
+	} else {
+		await chrome.storage.sync.set({["theme"]: "dark"});
+	}
+	setThemeMode();
+};
 
 // Once the DOM is ready...
 window.addEventListener('DOMContentLoaded', async () => {
-  // ...query for the active tab...
+	//get the color theme the user has decided
+	setThemeMode();
+
+  // query for the active tab
   const tabs = await getActiveTabURL();
-  // ...and send a request for the DOM info...
+  // send a request for the addresses and use callback of viewAddresses on the response
   chrome.tabs.sendMessage(
   	tabs[0].id,
   	{type: 'Addresses', value: ''},
-  	// ...also specifying a callback to be called 
-  	//    from the receiving end (content script).
   	viewAddresses);
 });

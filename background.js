@@ -39,3 +39,9 @@ chrome.tabs.onActivated.addListener(activeInfo => {
   }, setBadgeIcon);
 });
 
+
+// When we are installed, set the theme to light until clicked
+chrome.runtime.onInstalled.addListener(details => {
+  chrome.storage.sync.set({["theme"]: "dark"});
+});
+

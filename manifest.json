@@ -3,7 +3,7 @@
 	"description": "Highlights cryptocurrency.",
 	"version": "1.0.0",
 	"manifest_version": 3,
-	"permissions": ["tabs"],
+	"permissions": ["tabs", "storage"],
 	"background": {
     	"service_worker": "background.js"
   	},
