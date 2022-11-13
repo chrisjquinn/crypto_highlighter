@@ -15,6 +15,12 @@
   		}
   	],
   	"action": {
+  		"default_icon": {
+  			"16": "assets/highlight-icon.png",
+  			"32": "assets/highlight-icon.png",
+  			"48": "assets/highlight-icon.png",
+  			"128": "assets/highlight-icon.png"
+  		},
     	"default_popup": "popup.html",
     	"default_title": "Click to see captured crypto addrs"
   	}
