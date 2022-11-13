@@ -9,10 +9,6 @@ function onlyUnique(value, index, self) {
 
 const performRegex = (highlight) => {
 	  // param highlight will wrap the match in a span if wanted
-	  // Construct global and multiline
-	  // const btc_re = new RegExp(regexs.BTC, 'gm');
-	  // const eth_re = new RegExp(regexs.ETH, 'gm');
-
 	  let matches = {
 	  	BTC: [],
 	  	ETH: [],
@@ -41,6 +37,7 @@ const performRegex = (highlight) => {
 	  }
 
 	  // Below is a to:do, figure out how to represent addresses found in commented HTML
+	  // Also figure out for addresses within html non-text (e.g. as an id or class name)
 
 	  // let comments = getAllComments(document.documentElement);
 	  // for (let i = 0; i < comments.length; i++) {
@@ -75,7 +72,6 @@ const performRegex = (highlight) => {
 	  	for (let i = 0; i < tickers_to_delete.length; i ++){
 	  		delete matches[tickers_to_delete[i]];
 	  	}
-	  	// console.log(`${Object.values(matches)} matches: ${JSON.stringify(matches)}`);
 	  	return matches;
 	  }
 };
@@ -101,6 +97,7 @@ function getTextNodes(rootElem){
 };
 
 function wrapTextNode(textNode, ticker) {
+	// Take a text node and wrap it in a span, creating the highlight
     var spanNode = document.createElement('span');
     spanNode.setAttribute('class', 'crypto-highlighter-mark-'+ticker.toLowerCase());
     var newTextNode = document.createTextNode(textNode.textContent);
@@ -118,29 +115,15 @@ const copyAddressToClipboard = e => {
 
 
 // below are the chrome listeners for messages from background.js
-// Think these can be collapsed into one
-
 chrome.runtime.onMessage.addListener((obj, sender, response) => {
 	const {type, value} = obj;
 	if (type === 'NEW'){
 		matches = performRegex(true);
 		response(matches);
-	}
-});
-
-
-chrome.runtime.onMessage.addListener((obj, sender, response) => {
-	const {type, value} = obj;
-	if (type === 'SWITCHED'){
+	} else if (type === 'SWITCHED'){
 		matches = performRegex(false);
 		response(matches);
-	}
-});
-
-
-chrome.runtime.onMessage.addListener((obj, sender, response) => {
-	const {type, value} = obj;
-	if (type === 'Addresses'){
+	} else if (type === 'Addresses'){
 		matches = performRegex(false);
 		response(matches);
 	}
