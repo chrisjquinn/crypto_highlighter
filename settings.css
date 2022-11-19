@@ -1,0 +1,41 @@
+p {
+  font-size: 10px;
+}
+
+img {
+  height: 15px;
+  width: 15px;
+}
+
+/*input:active {
+  box-shadow: 5px 5px 20px 2px #999999;
+}*/
+
+/*input {
+  height: 15px;
+  width: 15px;
+}*/
+
+.dark-mode {
+  background-color: black;
+  color: white;
+}
+
+
+input:valid {
+  background-color: white;
+  outline: none;
+}
+
+input:invalid {
+  outline: 3px solid rgba(255,0,0,0.5);
+}
+
+/* For the do not run sites */
+span:hover {
+  cursor: pointer;
+}
+
+ul li.checked {
+  text-decoration: line-through;
+}
