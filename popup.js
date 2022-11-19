@@ -1,4 +1,4 @@
-import {getActiveTabURL} from "./utils.js"
+import {getActiveTab} from "./utils.js"
 
 let color_theme;
 
@@ -116,16 +116,21 @@ const toggleThemeMode = async () => {
 	setThemeMode();
 };
 
+const openSettings = () => {
+	chrome.tabs.create({url: chrome.runtime.getURL('settings.html')});
+};
+
 // Once the DOM is ready...
 window.addEventListener('DOMContentLoaded', async () => {
+	let settings = document.getElementById('Settings');
+	settings.addEventListener('click', openSettings);
 	//get the color theme the user has decided
 	setThemeMode();
-
-  // query for the active tab
-  const tabs = await getActiveTabURL();
-  // send a request for the addresses and use callback of viewAddresses on the response
-  chrome.tabs.sendMessage(
-  	tabs[0].id,
-  	{type: 'Addresses', value: ''},
-  	viewAddresses);
+	// query for the active tab
+	const tabs = await getActiveTab();
+	// send a request for the addresses and use callback of viewAddresses on the response
+	chrome.tabs.sendMessage(
+		tabs[0].id,
+		{type: 'Addresses', value: ''},
+		viewAddresses);
 });

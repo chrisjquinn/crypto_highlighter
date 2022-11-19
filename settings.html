@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link href="settings.css" rel="stylesheet" type="text/css">
+		<title>Settings - crypto_highlighter</title>
+		<link rel="icon" type="image/x-icon" href="assets/highlight-icon.png">
+	</head>
+
+	<body>
+		<script type="module" src="settings.js"></script>
+		<div id="header"></div>
+		<h1>Settings - crypto_highlighter</h1>
+		<h2>Color Theme</h2>
+		<input type="radio" id="light" name="theme" value="light"><label for="light">Light</label>
+		<input type="radio" id="dark" name="theme" value="dark"><label for="dark">Dark</label><br>  
+		<h3>Do Not Run Sites</h3>
+		<!-- Input form thingy goes here -->
+		<div id="myDIV" class="header">
+		  <input id="myInput" type="text" placeholder="example.com" pattern="\w+\.\w+">
+		  <span id="addBtn" class="addBtn">Add</span>
+		</div>
+
+		<ul id="listRoot"></ul>
+	</body>
+</html>
