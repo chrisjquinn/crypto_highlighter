@@ -45,10 +45,10 @@ const setBadgeIcon = items =>  {
 //determine if we should send a message to perform address checking
 const runOnSite = async () => {
   let current_url = await getActiveTabURL();
-  console.log(`current_url: ${current_url}`);
+  // console.log(`current_url: ${current_url}`);
   let dnr_sites = await chrome.storage.sync.get(['doNotRun']);
   dnr_sites = dnr_sites.doNotRun;
-  console.log(`dnr_sites: ${dnr_sites}`);
+  // console.log(`dnr_sites: ${dnr_sites}`);
   for (let i = 0; i < dnr_sites.length; i++){
     if (current_url.includes(dnr_sites[i])){
       console.log(`${current_url} includes ${dnr_sites[i]}`);
@@ -82,9 +82,10 @@ chrome.tabs.onActivated.addListener(async activeInfo => {
 });
 
 
-// When we are installed, set the theme to light until clicked
+// When we are installed, set some default values until the user decides
 chrome.runtime.onInstalled.addListener(details => {
   chrome.storage.sync.set({["theme"]: "light"});
   chrome.storage.sync.set({["doNotRun"]: ['etherscan.io']});
+  chrome.storage.sync.set({['preferences']: {'cryptoscamdb': true}});
 });
 

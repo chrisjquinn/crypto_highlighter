@@ -15,6 +15,10 @@
   			"css": ["highlighter.css"]
   		}
   	],
+  	"web_accessible_resources": [
+  		{"resources": ["utils.js"],
+  		"matches": ["https://*/*", "http://*/*", "file://*/*"]}
+  	],
   	"action": {
   		"default_icon": {
   			"16": "assets/highlight-icon.png",

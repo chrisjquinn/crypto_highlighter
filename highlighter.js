@@ -1,3 +1,5 @@
+let preferences;
+
 const regexs = {
 	BTC: /\bbc1[02-9ac-hj-np-z]{11,71}\b|\b[13][a-zA-HJ-NP-Z0-9]{23,39}\b/,
 	ETH: /\b0x[a-fA-F0-9]{40}\b/
@@ -8,33 +10,34 @@ function onlyUnique(value, index, self) {
 };
 
 const performRegex = (highlight) => {
-	  // param highlight will wrap the match in a span if wanted
-	  let matches = {
+	// load in the preferences
+	// console.log(`${JSON.stringify(preferences)}`);
+	// param highlight will wrap the match in a span if wanted
+	let matches = {
 	  	BTC: [],
 	  	ETH: [],
 	  	DOGE: [] // left for testing 
 	  };
 
-	  let texts = getTextNodes(document.documentElement);
-	  // texts = [].concat.apply([],texts);
-	  for (let i = 0; i < texts.length; i++){
-	  	for (let j = 0; j < Object.keys(regexs).length; j++) {
-	  		ticker = Object.keys(regexs)[j];
-	  		re = new RegExp(regexs[ticker], 'gm');
-	  		match = texts[i].nodeValue.match(re);
-		  	if ((match) && (match.indexOf(",") == -1)) {
-		  		matches[ticker].push(... match);
-		  		// make mark on texts[i]
-		  		if (highlight) {wrapTextNode(texts[i], ticker);}
-		  	} else if ((match) && (match.indexOf(",") > -1)) {
-		  		matches[ticker].push(... match.split(","));
-		  		// make mark on texts[i]
-		  		if (highlight) {wrapTextNode(texts[i], ticker);}
-		  	} else {}
-
-	  	}
-
-	  }
+	let texts = getTextNodes(document.documentElement);
+	// texts = [].concat.apply([],texts);
+    for (let i = 0; i < texts.length; i++){
+        for (let j = 0; j < Object.keys(regexs).length; j++) {
+            ticker = Object.keys(regexs)[j];
+      		re = new RegExp(regexs[ticker], 'gm');
+      		match = texts[i].nodeValue.match(re);
+    	  	if ((match) && (match.indexOf(",") == -1)) {
+    	  		matches[ticker].push(... match);
+    	  		// make mark on texts[i]
+    	  		if (highlight) {wrapTextNode(texts[i], ticker);}
+    	  	} else if ((match) && (match.indexOf(",") > -1)) {
+                matches[ticker].push(... match.split(","));
+    	  		// make mark on texts[i]
+    	  		if (highlight) {wrapTextNode(texts[i], ticker);}
+                // console.log(`Address labelled as: ${getAddressInfoFromCryptoscamdb(texts[i])}`);
+    	  	} else {}
+        }
+    }
 
 	  // Below is a to:do, figure out how to represent addresses found in commented HTML
 	  // Also figure out for addresses within html non-text (e.g. as an id or class name)
@@ -58,8 +61,8 @@ const performRegex = (highlight) => {
 	  // }
 
 
-	  if (matches) {
-	  	let tickers_to_delete = [];
+	if (matches) {
+        let tickers_to_delete = [];
 	  	for (let i = 0; i < Object.keys(matches).length; i++){
 	  		ticker = Object.keys(matches)[i];
 	  		if (matches[ticker].length == 0){
@@ -68,18 +71,18 @@ const performRegex = (highlight) => {
 		  		let uniques = matches[ticker].filter(onlyUnique);
 		  		matches[ticker] = uniques;
 	  		}
-	  	}
+	    }
 	  	for (let i = 0; i < tickers_to_delete.length; i ++){
 	  		delete matches[tickers_to_delete[i]];
 	  	}
 	  	return matches;
-	  }
+	}
 };
 
 function getAllComments(rootElem) {
-    var comments = [];
-    var iterator = document.createNodeIterator(rootElem, NodeFilter.SHOW_COMMENT);
-    var curNode;
+    let comments = [];
+    let iterator = document.createNodeIterator(rootElem, NodeFilter.SHOW_COMMENT);
+    let curNode;
     while (curNode = iterator.nextNode()) {
         comments.push(curNode);
     }
@@ -87,14 +90,19 @@ function getAllComments(rootElem) {
 };
 
 function getTextNodes(rootElem){
-    var texts = [];
-    var iterator = document.createNodeIterator(rootElem, NodeFilter.SHOW_TEXT);
-    var curNode;
+    let texts = [];
+    let iterator = document.createNodeIterator(rootElem, NodeFilter.SHOW_TEXT);
+    let curNode;
     while (curNode = iterator.nextNode()) {
         texts.push(curNode);
     }
     return texts;
 };
+
+async function loadPreferences(){
+	let local_preferences = await chrome.storage.sync.get(['preferences']);
+	preferences = local_preferences.preferences;
+}
 
 function wrapTextNode(textNode, ticker) {
 	// Take a text node and wrap it in a span, creating the highlight
@@ -110,13 +118,13 @@ const copyAddressToClipboard = e => {
 	// works for span, needs some sort of visual confirmation
 	const addressText = e.target.innerText;
 	navigator.clipboard.writeText(addressText);
-	// console.log(`Copied the text: ${addressText}`);
 };
 
 
 // below are the chrome listeners for messages from background.js
-chrome.runtime.onMessage.addListener((obj, sender, response) => {
+chrome.runtime.onMessage.addListener(async (obj, sender, response) => {
 	const {type, value} = obj;
+	await loadPreferences();
 	if (type === 'NEW'){
 		matches = performRegex(true);
 		response(matches);

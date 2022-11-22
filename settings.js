@@ -1,52 +1,44 @@
 // Create a new list item when clicking on the "Add" button
-// TODO; re-factor the setSavedURLS() to use calls on this
 function newElement() {
   var li = document.createElement("li");
-  var input = document.getElementById("myInput");
-  if (input.checkValidity()){
-      let inputValue = input.value
-      var t = document.createTextNode(inputValue);
-      li.appendChild(t);
-      document.getElementById("listRoot").appendChild(li);
-      document.getElementById("myInput").value = "";
-  }
-  var span = document.createElement("span");
-  var txt = document.createTextNode("\u00D7");
+  let input = document.getElementById("myInput");
+  let t = document.createTextNode(input.value);
+  li.appendChild(t);
+  input.value = "";
+  let span = document.createElement("span");
+  let txt = document.createTextNode("\u00D7");
   span.className = "close";
+  span.onclick = function(){
+    li.style.display = "none";
+    setSavedURLS();
+  }
   span.appendChild(txt);
   li.appendChild(span);
-
-  for (let i = 0; i < close.length; i++) {
-    close[i].onclick = function() {
-      var div = this.parentElement;
-      div.style.display = "none";
-    }
-  }
+  let list_root = document.getElementById("listRoot");
+  list_root.appendChild(li);
   setSavedURLS();
 }
 
-const setSavedURLS = () => {
+const setSavedURLS = async () => {
   // Get all the urls on the page
   let urls_to_save = [];
   let all_li = document.getElementsByTagName('li');
   for (let i = 0; i < all_li.length; i++){
     if (all_li[i].style.display !== "none"){
-      console.log(`${all_li[i].childNodes[0].textContent} is not none`);
       urls_to_save.push(all_li[i].childNodes[0].textContent);
     }
   }
-  chrome.storage.sync.set({["doNotRun"]: urls_to_save})
+  console.log(`${JSON.stringify(urls_to_save)}`);
+  await chrome.storage.sync.set({["doNotRun"]: urls_to_save});
 };
 
 
 const getSavedURLS = async () => {
   let urls = await chrome.storage.sync.get(["doNotRun"]);
   urls = urls.doNotRun;
-  console.log(`urls: ${urls}`);
   let list_root = document.getElementById("listRoot");
   for (let i = 0; i < urls.length; i++){
     let li = document.createElement("li");
-    console.log(`urls[i]: ${urls[i]}`);
     li.textContent = urls[i];
     let span = document.createElement("span");
     let txt = document.createTextNode("\u00D7");
@@ -93,8 +85,31 @@ const toggleThemeMode = async () => {
   setThemeMode();
 };
 
+const loadPreferences = async () => {
+  const preferences = await chrome.storage.sync.get(['preferences']);
+  return preferences.preferences;
+};
+
+const setPreference = async (e) => {
+  const preference = e.target.id;
+  let current_preferences = await loadPreferences();
+  const checkbox_element = document.getElementById(preference);
+  current_preferences[preference] = checkbox_element.checked;
+  chrome.storage.sync.set({['preferences']: current_preferences});
+};
+
+const populatePreferences = async () => {
+  const preferences = await loadPreferences();
+  for (let key in preferences){
+    let checkbox_element = document.getElementById(key);
+    checkbox_element.checked = preferences[key];
+    checkbox_element.addEventListener('change', setPreference);
+  }
+};
+
 // Once the DOM is ready...
 document.addEventListener('DOMContentLoaded', async () => {
+  populatePreferences();
   getSavedURLS();
   setThemeMode();
   document.getElementById('addBtn').addEventListener('click', newElement);
